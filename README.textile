@@ -20,7 +20,7 @@ An example speaks a thousand words, I know...
 
 <pre><code>$('#photos').flickr({api_key: 'xxx'}).getRecentPhotos({per_page: 2}).addClass('thumbnails')
 
-// returns something like
+// returns something like ...
 
 <div id="photos" class="thumbnails">
   <ul class="flickr">
