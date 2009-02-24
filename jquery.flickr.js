@@ -45,21 +45,23 @@
   $.flickr.methods = {
     // http://www.flickr.com/services/api/flickr.photos.getRecent.html
     photosGetRecent: function(options) {
-      var options = $.extend($.flickr.settings, options || {})
+      var options = $.extend($.flickr.settings, options || {}),
+          elements = $.flickr.self
       
-      return $.flickr.self.each(function() {
+      return elements.each(function() {
         $.getJSON($.flickr.url('flickr.photos.getRecent', options), function(data) {
-          $.flickr.self.append($.flickr.thumbnail(data.photos))
+          elements.append($.flickr.thumbnail(data.photos))
         })
       })
     },
     // http://www.flickr.com/services/api/flickr.photos.getContactsPublicPhotos.html
     photosGetContactsPublicPhotos: function(options) {
-      var options = $.extend($.flickr.settings, options || {})
+      var options = $.extend($.flickr.settings, options || {}),
+          elements = $.flickr.self
       
-      return $.flickr.self.each(function() {
+      return elements.each(function() {
         $.getJSON($.flickr.url('flickr.photos.getContactsPublicPhotos', options), function(data) {
-          $.flickr.self.append($.flickr.thumbnail(data.photos))
+          elements.append($.flickr.thumbnail(data.photos))
         })
       })
     }
