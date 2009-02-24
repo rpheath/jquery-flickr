@@ -32,7 +32,7 @@
           image.alt = photo.title
           
           return ['<img src="' + image.src + '" alt="' + image.alt + '" />']
-        }).join(" ")
+        }).join("\n")
       }
     }
     
@@ -46,10 +46,20 @@
     $.flickr.methods = {
       // http://www.flickr.com/services/api/flickr.photos.getRecent.html
       photosGetRecent: function(options) {
-        var options = $.extend({}, options || {})
+        var options = $.extend($.flickr.settings, options || {})
         
         return $.flickr.self.each(function() {
           $.getJSON($.flickr.url('flickr.photos.getRecent', options), function(data) {
+            $.flickr.self.html($.flickr.thumbnail(data.photos))
+          })
+        })
+      },
+      // http://www.flickr.com/services/api/flickr.photos.getContactsPublicPhotos.html
+      photosGetContactsPublicPhotos: function(options) {
+        var options = $.extend($.flickr.settings, options || {})
+        
+        return $.flickr.self.each(function() {
+          $.getJSON($.flickr.url('flickr.photos.getContactsPublicPhotos', options), function(data) {
             $.flickr.self.html($.flickr.thumbnail(data.photos))
           })
         })
