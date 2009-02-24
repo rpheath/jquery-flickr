@@ -25,12 +25,12 @@ An example speaks a thousand words, I know...
 <div id="photos" class="thumbnails">
   <ul class="flickr">
     <li>
-      <a title="<image title>" href="http://www.flickr.com/photos/user_id/photo_id/">
+      <a title="<image title>" href="http://www.flickr.com/photos/<user_id>/<photo_id>/">
         <img alt="<image title>" src="<square thumbnail url>"/>
       </a>
     </li>
     <li>
-      <a title="<image title>" href="http://www.flickr.com/photos/user_id/photo_id/">
+      <a title="<image title>" href="http://www.flickr.com/photos/<user_id>/<photo_id>/">
         <img alt="<image title>" src="<square thumbnail url>"/>
       </a>
     </li>
