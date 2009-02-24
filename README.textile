@@ -2,6 +2,10 @@ h1. (Some of) the Flickr API in jQuery.
 
 Sometimes all you need is a simple javascript interface to pull in Flickr photos.
 
+h4. Requirements
+
+Your Flickr API key.
+
 h2. Why?
 
 Because I _love_ javascript. Also, because I had to solve this problem recently, and the current solutions were 
