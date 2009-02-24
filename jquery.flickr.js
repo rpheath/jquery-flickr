@@ -1,7 +1,8 @@
 /*****************************************
  * Flickr API (in jQuery)
  * version: 1.0 (02/23/2009)
- * written for jQuery 1.3.2 or later
+ * written for jQuery 1.3.2
+ * by Ryan Heath (http://rpheath.com)
  *****************************************/
 (function($) {
   // core extensions
@@ -17,10 +18,14 @@
   
   // base flickr object
   $.flickr = {
+    // the actual request url
+    // (constructs extra params as they come in)
     url: function(method, params) {
       return 'http://api.flickr.com/services/rest/?method=' + method + '&format=json' +
         '&api_key=' + $.flickr.settings.api_key + ($.isEmpty(params) ? '' : '&' + $.param(params)) + '&jsoncallback=?'
     },
+    // accepts a series of photos and constructs
+    // the thumbnails that link back to Flickr
     thumbnail: function(photos) {
       var thumbnails = $.map(photos.photo, function(photo) {
         var src = 'http://farm' + photo.farm + '.static.flickr.com/' + photo.server + '/' + photo.id + '_' + photo.secret + '_s.jpg',
