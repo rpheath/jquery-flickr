@@ -41,29 +41,27 @@
     }
   }
   
+  // handles requesting and thumbnailing photos
+  $.flickr.handle = function(method, options) {
+    var options = $.extend($.flickr.settings, options || {}),
+        elements = $.flickr.self
+    
+    return elements.each(function() {
+      $.getJSON($.flickr.url(method, options), function(data) {
+        elements.append($.flickr.thumbnail(data.photos))
+      })
+    })
+  }
+  
   // namespace to hold available API methods
   $.flickr.methods = {
     // http://www.flickr.com/services/api/flickr.photos.getRecent.html
     photosGetRecent: function(options) {
-      var options = $.extend($.flickr.settings, options || {}),
-          elements = $.flickr.self
-      
-      return elements.each(function() {
-        $.getJSON($.flickr.url('flickr.photos.getRecent', options), function(data) {
-          elements.append($.flickr.thumbnail(data.photos))
-        })
-      })
+      $.flickr.handle('flickr.photos.getRecent', options)
     },
     // http://www.flickr.com/services/api/flickr.photos.getContactsPublicPhotos.html
     photosGetContactsPublicPhotos: function(options) {
-      var options = $.extend($.flickr.settings, options || {}),
-          elements = $.flickr.self
-      
-      return elements.each(function() {
-        $.getJSON($.flickr.url('flickr.photos.getContactsPublicPhotos', options), function(data) {
-          elements.append($.flickr.thumbnail(data.photos))
-        })
-      })
+      $.flickr.handle('flickr.photos.getContactsPublicPhotos', options)
     }
   }
   
