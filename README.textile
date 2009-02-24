@@ -1,1 +1,69 @@
-Simple implementation of (some of) the Flickr API in jQuery.
+h1. Simple implementation of (some of) the Flickr API in jQuery.
+
+Sometimes all you need is a simple javascript interface to pull in Flickr photos.
+
+h2. Why?
+
+Because I had to solve this problem recently, and the current solutions were too "not my style". Most had 
+a universal @flickr()@ method that required the user to pass a string of the method to be executed. I'd rather
+just _call_ a method that explain what method to call. Which brings me into my next point...
+
+h2. Chaining
+
+Something common to jQuery users is the ability to chain method calls. Well, I took that a step further when
+designing out the plugin interface. Initially, the user calls @flickr()@ on the jQuery object, which then makes all
+of the support Flickr API calls available, allowing the user to "chain" the API call directly. And the beauty
+is that the result of the API call will then return the original jQuery object, so you can continue on your merry way :-)
+
+An example speaks a thousand words, I know...
+
+<pre><code>$('#photos').flickr({api_key: 'xxx'}).getRecentPhotos({per_page: 2}).addClass('thumbnails')
+
+// returns something like
+<div id="photos" class="thumbnails">
+  <ul class="flickr">
+    <li>
+      <a title="<image title>" href="http://www.flickr.com/photos/user_id/photo_id/">
+        <img alt="<image title>" src="<square thumbnail url>"/>
+      </a>
+    </li>
+    <li>
+      <a title="<image title>" href="http://www.flickr.com/photos/user_id/photo_id/">
+        <img alt="<image title>" src="<square thumbnail url>"/>
+      </a>
+    </li>
+  </ul>
+</div>
+</code></pre>
+
+You can see how calling @addClass()@ at the very end was pretty much the same as calling @$('#photos').addClass()@ directly.
+
+Also, any configuration you pass to the first call (i.e. @flickr()@) will get merged with the rest of the calls and appended
+to the request url. So things like the API key (which is required on _every_ request) become a little less redundant.
+
+h2. Examples
+
+<pre><code>// common configuration
+var config = {
+  api_key: 'xxx'
+}
+
+// recent public photos
+$('#photos').flickr(config).photosGetRecent()
+
+// recent 8 photos from a user's contacts
+$('#photos').flickr(config).photosGetContactsPublicPhotos({user_id: 'xxx', count: 8})
+
+// recent 10 photos from a user's stream
+$('#photos').flickr(config).photosSearch({user_id: 'xxx', count: 10})
+
+// recent 10 photos from a user's stream with the tag 'portfolio'
+$('#photos').flickr(config).photosSearch({user_id: 'xxx', count: 10, tags: 'portfolio'})
+</code></pre>
+
+You get the idea. All of the options available on the "Flickr API":http://flickr.com/services/api (for the supported methods)
+are available. The @photosSearch()@ method is by far the most useful - perfect for showing your photos on your blog or site.
+
+h2. License
+
+(c) 2008 Ryan Heath, released under the MIT license
