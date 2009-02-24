@@ -22,7 +22,7 @@
         '&api_key=' + $.flickr.settings.api_key + ($.isEmpty(params) ? '' : '&' + $.param(params)) + '&jsoncallback=?'
     },
     thumbnail: function(photos) {
-      return $.map(photos.photo, function(photo) {
+      var thumbnails = $.map(photos.photo, function(photo) {
         var src = 'http://farm' + photo.farm + '.static.flickr.com/' + photo.server + '/' + photo.id + '_' + photo.secret + '_s.jpg',
             image = new Image(), html = ''
 
@@ -36,8 +36,10 @@
           html = '<img src="' + image.src + '" alt="' + image.alt + '" />'
         }
           
-        return [html]
+        return ['<li>' + html + '</li>']
       }).join("\n")
+      
+      return $('<ul class="flickr"></ul>').append(thumbnails)
     }
   }
   
