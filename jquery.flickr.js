@@ -26,12 +26,19 @@
       thumbnail: function(photos) {
         return $.map(photos.photo, function(photo) {
           var src = 'http://farm' + photo.farm + '.static.flickr.com/' + photo.server + '/' + photo.id + '_' + photo.secret + '_s.jpg',
-              image = new Image()
+              image = new Image(), html = ''
 
           image.src = src
           image.alt = photo.title
           
-          return ['<img src="' + image.src + '" alt="' + image.alt + '" />']
+          if ($.flickr.settings.link_images) {
+            html = '<a href="http://www.flickr.com/photos/' + photo.owner + '/' + photo.id + '/"' +
+              'title="' + photo.title + '"><img src="' + image.src + '" alt="' + image.alt + '" /></a>'
+          } else {
+            html = '<img src="' + image.src + '" alt="' + image.alt + '" />'
+          }
+            
+          return [html]
         }).join("\n")
       }
     }
@@ -39,7 +46,8 @@
     // base configuration
     $.flickr.settings = $.extend({
       api_key: 'YOUR API KEY',
-      user_id: 'YOUR USER ID'
+      user_id: 'YOUR USER ID',
+      link_images: true
     }, options || {})
     
     // namespace to hold available API methods
