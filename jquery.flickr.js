@@ -62,6 +62,10 @@
     // http://www.flickr.com/services/api/flickr.photos.getContactsPublicPhotos.html
     photosGetContactsPublicPhotos: function(options) {
       $.flickr.handle('flickr.photos.getContactsPublicPhotos', options)
+    },
+    // http://www.flickr.com/services/api/flickr.photos.search.html
+    photosSearch: function(options) {
+      $.flickr.handle('flickr.photos.search', options)
     }
   }
   
