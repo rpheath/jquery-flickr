@@ -44,7 +44,7 @@
   }
   
   // handles requesting and thumbnailing photos
-  $.flickr.handle = function(method, options) {
+  $.flickr.photos = function(method, options) {
     var options = $.extend($.flickr.settings, options || {}),
         elements = $.flickr.self
     
@@ -59,15 +59,15 @@
   $.flickr.methods = {
     // http://www.flickr.com/services/api/flickr.photos.getRecent.html
     photosGetRecent: function(options) {
-      $.flickr.handle('flickr.photos.getRecent', options)
+      $.flickr.photos('flickr.photos.getRecent', options)
     },
     // http://www.flickr.com/services/api/flickr.photos.getContactsPublicPhotos.html
     photosGetContactsPublicPhotos: function(options) {
-      $.flickr.handle('flickr.photos.getContactsPublicPhotos', options)
+      $.flickr.photos('flickr.photos.getContactsPublicPhotos', options)
     },
     // http://www.flickr.com/services/api/flickr.photos.search.html
     photosSearch: function(options) {
-      $.flickr.handle('flickr.photos.search', options)
+      $.flickr.photos('flickr.photos.search', options)
     }
   }
   
