@@ -24,28 +24,54 @@
       return 'http://api.flickr.com/services/rest/?method=' + method + '&format=json' +
         '&api_key=' + $.flickr.settings.api_key + ($.isEmpty(params) ? '' : '&' + $.param(params)) + '&jsoncallback=?'
     },
-    // accepts a series of photos and constructs
-    // the thumbnails that link back to Flickr
-    thumbnail: function(photos) {
-      var thumbnails = $.map(photos.photo, function(photo) {
-        var src = 'http://farm' + photo.farm + '.static.flickr.com/' + photo.server + '/' + photo.id + '_' + photo.secret + '_s.jpg',
-            image = new Image(), html = ''
-
-        image.src = src
-        image.alt = photo.title
-        
-        if ($.flickr.settings.link_images) {
-          html = '<a href="' + ['http://www.flickr.com/photos', photo.owner, photo.id].join('/') + '/"' +
-            'title="' + photo.title + '"><img src="' + image.src + '" alt="' + image.alt + '" /></a>'
-        } else {
-          html = '<img src="' + image.src + '" alt="' + image.alt + '" />'
-        }
-          
-        return ['<li>' + html + '</li>']
-      }).join("\n")
-      
-      return $('<ul class="flickr"></ul>').append(thumbnails)
+    // translate plugin image sizes to flickr sizes
+    translate: function(size) {
+      switch(size) {
+        case 'sq': return '_s' // square
+        case 't' : return '_t' // thumbnail
+        case 's' : return '_m' // small
+        case 'm' : return ''   // medium
+        default  : return ''   // medium
+      }
+    },
+    // determines what to do with the links
+    linkTag: function(text, photo, href) {
+      if (href === undefined) href = ['http://www.flickr.com/photos', photo.owner, photo.id].join('/')      
+      return '<a href="' + href + '" title="' + photo.title + '">' + text + '</a>'
     }
+  }
+  
+  // helper methods for thumbnails
+  $.flickr.thumbnail = {
+    src: function(photo, size) {
+      if (size === undefined) size = $.flickr.translate($.flickr.settings.thumbnail_size)
+      return 'http://farm' + photo.farm + '.static.flickr.com/' + photo.server + 
+        '/' + photo.id + '_' + photo.secret + size + '.jpg'
+    },
+    imageTag: function(image) {
+      return '<img src="' + image.src + '" alt="' + image.alt + '" />'
+    }
+  }
+  
+  // accepts a series of photos and constructs
+  // the thumbnails that link back to Flickr
+  $.flickr.thumbnail.process = function(photos) {
+    var thumbnails = $.map(photos.photo, function(photo) {
+      var image = new Image(), html = '', href = undefined
+
+      image.src = $.flickr.thumbnail.src(photo)
+      image.alt = photo.title
+
+      var size = $.flickr.settings.link_to_size
+      if (size != undefined && size.match(/sq|t|s|m|o/)) 
+        href = $.flickr.thumbnail.src(photo, $.flickr.translate(size))
+      
+      html = $.flickr.linkTag($.flickr.thumbnail.imageTag(image), photo, href)
+        
+      return ['<li>' + html + '</li>']
+    }).join("\n")
+    
+    return $('<ul class="flickr"></ul>').append(thumbnails)
   }
   
   // handles requesting and thumbnailing photos
@@ -55,7 +81,7 @@
     
     return elements.each(function() {
       $.getJSON($.flickr.url(method, options), function(data) {
-        elements.append($.flickr.thumbnail(data.photos))
+        elements.append($.flickr.thumbnail.process(data.photos))
       })
     })
   }
@@ -83,7 +109,7 @@
     // base configuration
     $.flickr.settings = $.extend({
       api_key: 'YOUR API KEY',
-      link_images: true
+      thumbnail_size: 'sq'
     }, options || {})
     
     return $.flickr.methods

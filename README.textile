@@ -45,10 +45,19 @@ An example speaks a thousand words, I know...
 You can see how calling @addClass()@ at the very end was pretty much the same as calling @$('#photos').addClass()@ directly.
 Again, the chained Flickr API call returns the original jQuery object.
 
-Note: you can turn off image linking by passing @{link_images: false}@ to the @flickr()@ method.
+h2. Handling Sizes
 
-Also, any configuration you pass to the first call (i.e. @flickr()@) will get merged with the rest of the calls and appended
-to the request url. So things like the API key (which is required on _every_ request) becomes a little less redundant.
+If no @link_to_size@ is specified in the configuration, the thumbnails will link back to flickr.
+
+Available sizes include:
+
+* 'sq' // => square
+* 't'  // => thumbnail
+* 's'  // => small
+* 'm'  // => medium
+
+Any invalid size will default to 'm'. You can also specify the thumbnail size in the same manner, but by passing a
+@thumbnail_size@ options to the @flickr()@ method.
 
 h2. Examples
 
