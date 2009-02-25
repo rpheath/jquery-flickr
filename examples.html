@@ -9,6 +9,7 @@
 	    #container { width: 900px; margin: 50px auto; background: #fff; padding: 25px; border: 1px solid #ccc; }
 	    h1 { color: #eee; font-size: 12px; margin-bottom: 10px; font-weight: normal; background: #111; padding: 7px; }
 	    h1 span { color: #999; }
+	    h1.section { color: #aaa; background: #fff; font-size: 35px; margin: 15px 0; }
 	    a img { border: 0; margin: 0; }
 	    div { margin-bottom: 35px; }
 	    ul { list-style-type: none; }
@@ -19,20 +20,32 @@
 	  <script type="text/javascript">
 	    $(document).ready(function() {
 	      var config = {
-	        api_key: 'YOUR API KEY',
 	        link_to_size: 'm'
 	      }	      
-	          
+	      
+	      // uses the API (API key required)
+	      // note: without an API key, all that can use feeds, will
+	      
+	      // options found at: http://www.flickr.com/services/api
 	      $('#recent').flickr(config).photosGetRecent({per_page: 10})
 	      $('#contacts').flickr(config).photosGetContactsPublicPhotos({user_id: '95448703@N00', count: 10})
 	      $('#search').flickr(config).photosSearch({user_id: '95448703@N00', per_page: 10})
 	      $('#portfolio').flickr(config).photosSearch({user_id: '95448703@N00', per_page: 10, tags: 'portfolio'})
 	      $('#photoset').flickr(config).photosetsGetPhotos({photoset_id: '72157600185772527', per_page: 10})
+	      
+	      // uses the Feeds (API key NOT required)
+	      // options found at: http://www.flickr.com/services/feeds
+	      $('#recent-feed').flickr().photosGetRecent()
+	      $('#search-feed').flickr().photosSearch({id: '95448703@N00'})
+	      $('#portfolio-feed').flickr().photosSearch({id: '95448703@N00', tags: 'portfolio'})
+	      $('#photoset-feed').flickr().photosetsGetPhotos({set: '72157600185772527', nsid: '95448703@N00'})
 	    })
 	  </script>
   </head>
   <body>
     <div id="container">
+      <h1 class="section">With an API key</h1>
+      
       <h1>photosGetRecent()</h1>
       <div id="recent"></div>
       
@@ -47,6 +60,23 @@
       
       <h1>photosetsGetPhotos(<span>{photoset_id: '72157600185772527', per_page: 10}</span>)</h1>
       <div id="photoset"></div>
+      
+      <h1 class="section">Without an API key</h1>
+      
+      <h1>photosGetRecent()</h1>
+      <div id="recent-feed"></div>
+      
+      <h1>photosGetContactsPublicPhotos()</h1>
+      <div id="contacts-feed">Requires an API key</div>
+      
+      <h1>photosSearch(<span>{id: '95448703@N00'}</span>)</h1>
+      <div id="search-feed"></div>
+      
+      <h1>photosSearch(<span>{id: '95448703@N00', tags: 'portfolio'}</span>)</h1>
+      <div id="portfolio-feed"></div>
+      
+      <h1>photosetsGetPhotos(<span>{set: '72157600185772527', nsid: '95448703@N00'}</span>)</h1>
+      <div id="photoset-feed"></div>
     </div>
   </body>
 </html>

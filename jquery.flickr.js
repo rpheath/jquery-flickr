@@ -16,34 +16,53 @@
     }
   })
   
-  // base flickr object
   $.flickr = {
-    // the actual request url
-    // (constructs extra params as they come in)
-    url: function(method, params) {
-      return 'http://api.flickr.com/services/rest/?method=' + method + '&format=json' +
-        '&api_key=' + $.flickr.settings.api_key + ($.isEmpty(params) ? '' : '&' + $.param(params)) + '&jsoncallback=?'
-    },
-    // translate plugin image sizes to flickr sizes
-    translate: function(size) {
-      switch(size) {
-        case 'sq': return '_s' // square
-        case 't' : return '_t' // thumbnail
-        case 's' : return '_m' // small
-        case 'm' : return ''   // medium
-        default  : return ''   // medium
-      }
-    },
-    // determines what to do with the links
-    linkTag: function(text, photo, href) {
-      if (href === undefined) href = ['http://www.flickr.com/photos', photo.owner, photo.id].join('/')      
-      return '<a href="' + href + '" title="' + photo.title + '">' + text + '</a>'
+    // Flickr API is now optional (uses feeds alternatively)
+    // see http://www.flickr.com/services/feeds/ for details
+    api: true
+  }
+  
+  // the actual request url
+  // (constructs extra params as they come in)
+  $.flickr.url = function(method, params) {
+    var base = 'http://api.flickr.com/services', service_type, query
+        
+    if (!$.flickr.api && method.match(/\.gne$/)) {
+      service_type = '/feeds/'
+      query = method + '?'
+    } else {
+      service_type = '/rest/'
+      query = '?' + method + '&api_key=' + $.flickr.settings.api_key + '&'
     }
+    
+    return [base, service_type, query].join('') + 'format=json' + 
+      ($.isEmpty(params) ? '' : '&' + $.param(params)) + '&jsoncallback=?'
+  }
+  
+  // translate plugin image sizes to flickr sizes
+  $.flickr.translate = function(size) {
+    switch(size) {
+      case 'sq': return '_s' // square
+      case 't' : return '_t' // thumbnail
+      case 's' : return '_m' // small
+      case 'm' : return ''   // medium
+      default  : return ''   // medium
+    }
+  }
+  
+  // determines what to do with the links
+  $.flickr.linkTag = function(text, photo, href) {
+    if (!$.flickr.api && photo.link) href = photo.link
+    
+    if (href === undefined) href = ['http://www.flickr.com/photos', photo.owner, photo.id].join('/')      
+    return '<a href="' + href + '" title="' + photo.title + '">' + text + '</a>'
   }
   
   // helper methods for thumbnails
   $.flickr.thumbnail = {
     src: function(photo, size) {
+      if (!$.flickr.api) return photo.media.m.replace(/_m/, '_s')
+      
       if (size === undefined) size = $.flickr.translate($.flickr.settings.thumbnail_size)
       return 'http://farm' + photo.farm + '.static.flickr.com/' + photo.server + 
         '/' + photo.id + '_' + photo.secret + size + '.jpg'
@@ -56,7 +75,9 @@
   // accepts a series of photos and constructs
   // the thumbnails that link back to Flickr
   $.flickr.thumbnail.process = function(photos) {
-    var thumbnails = $.map(photos.photo, function(photo) {
+    photos = $.flickr.api ? photos.photo : photos.items
+    
+    var thumbnails = $.map(photos, function(photo) {
       var image = new Image(), html = '', href = undefined
 
       image.src = $.flickr.thumbnail.src(photo)
@@ -74,6 +95,11 @@
     return $('<ul class="flickr"></ul>').append(thumbnails)
   }
   
+  // determines which method to use
+  $.flickr.which = function(api_call, feed_request) {
+    return $.flickr.api ? api_call : feed_request
+  }
+  
   // handles requesting and thumbnailing photos
   $.flickr.photos = function(method, options) {
     var options = $.extend($.flickr.settings, options || {}),
@@ -81,7 +107,7 @@
     
     return elements.each(function() {
       $.getJSON($.flickr.url(method, options), function(data) {
-        photos = (data.photos === undefined ? data.photoset : data.photos)
+        photos = $.flickr.api ? (data.photos === undefined ? data.photoset : data.photos) : data
         elements.append($.flickr.thumbnail.process(photos))
       })
     })
@@ -91,20 +117,24 @@
   // note: options available to each method match that of Flickr's docs
   $.flickr.methods = {
     // http://www.flickr.com/services/api/flickr.photos.getRecent.html
+    // - or -
+    // http://www.flickr.com/services/feeds/docs/photos_public/
     photosGetRecent: function(options) {
-      $.flickr.photos('flickr.photos.getRecent', options)
+      $.flickr.photos($.flickr.which('flickr.photos.getRecent', 'photos_public.gne'), options)
     },
     // http://www.flickr.com/services/api/flickr.photos.getContactsPublicPhotos.html
     photosGetContactsPublicPhotos: function(options) {
       $.flickr.photos('flickr.photos.getContactsPublicPhotos', options)
     },
     // http://www.flickr.com/services/api/flickr.photos.search.html
+    // - or -
+    // http://www.flickr.com/services/feeds/docs/photos_public/
     photosSearch: function(options) {
-      $.flickr.photos('flickr.photos.search', options)
+      $.flickr.photos($.flickr.which('flickr.photos.search', 'photos_public.gne'), options)
     },
     // http://www.flickr.com/services/api/flickr.photosets.getPhotos.html
     photosetsGetPhotos: function(options) {
-      $.flickr.photos('flickr.photosets.getPhotos', options)
+      $.flickr.photos($.flickr.which('flickr.photosets.getPhotos', 'photoset.gne'), options)
     }
   }
   
@@ -114,9 +144,11 @@
     
     // base configuration
     $.flickr.settings = $.extend({
-      api_key: 'YOUR API KEY',
+      //api_key: 'YOUR API KEY',
       thumbnail_size: 'sq'
     }, options || {})
+    
+    if ($.flickr.settings.api_key === undefined) $.flickr.api = false
     
     return $.flickr.methods
   }
