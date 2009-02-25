@@ -63,7 +63,8 @@ h2. Examples
 
 <pre><code>// common configuration
 var config = {
-  api_key: 'xxx'
+  api_key: 'xxx',
+  thumbnail_size: 'sq'
 }
 
 // recent public photos
@@ -77,6 +78,9 @@ $('#photos').flickr(config).photosSearch({user_id: 'xxx', count: 10})
 
 // recent 10 photos from a user's stream with the tag 'portfolio'
 $('#photos').flickr(config).photosSearch({user_id: 'xxx', count: 10, tags: 'portfolio'})
+
+// recent 10 photos from a particular photoset
+$('#photoset').flickr(config).photosetsGetPhotos({photoset_id: '72157600185772527', per_page: 10})
 </code></pre>
 
 You get the idea. All of the options listed on the "Flickr API":http://flickr.com/services/api (for the supported methods)

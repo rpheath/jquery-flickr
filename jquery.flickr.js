@@ -77,16 +77,18 @@
   // handles requesting and thumbnailing photos
   $.flickr.photos = function(method, options) {
     var options = $.extend($.flickr.settings, options || {}),
-        elements = $.flickr.self
+        elements = $.flickr.self, photos
     
     return elements.each(function() {
       $.getJSON($.flickr.url(method, options), function(data) {
-        elements.append($.flickr.thumbnail.process(data.photos))
+        photos = (data.photos === undefined ? data.photoset : data.photos)
+        elements.append($.flickr.thumbnail.process(photos))
       })
     })
   }
   
   // namespace to hold available API methods
+  // note: options available to each method match that of Flickr's docs
   $.flickr.methods = {
     // http://www.flickr.com/services/api/flickr.photos.getRecent.html
     photosGetRecent: function(options) {
@@ -99,6 +101,10 @@
     // http://www.flickr.com/services/api/flickr.photos.search.html
     photosSearch: function(options) {
       $.flickr.photos('flickr.photos.search', options)
+    },
+    // http://www.flickr.com/services/api/flickr.photosets.getPhotos.html
+    photosetsGetPhotos: function(options) {
+      $.flickr.photos('flickr.photosets.getPhotos', options)
     }
   }
   
