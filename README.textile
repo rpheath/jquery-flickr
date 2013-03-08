@@ -71,7 +71,7 @@ var config = {
 $('#photos').flickr(config).photosGetRecent()
 
 // recent 8 photos from a user's contacts
-$('#photos').flickr(config).photosGetContactsPublicPhotos({user_id: 'xxx', count: 8})
+$('#photos').flickr(config).photosGetContactsPublicPhotos({user_id: 'xxx', per_page: 8})
 
 // recent 10 photos from a user's stream
 $('#photos').flickr(config).photosSearch({user_id: 'xxx', per_page: 10})
