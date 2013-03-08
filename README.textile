@@ -74,10 +74,10 @@ $('#photos').flickr(config).photosGetRecent()
 $('#photos').flickr(config).photosGetContactsPublicPhotos({user_id: 'xxx', count: 8})
 
 // recent 10 photos from a user's stream
-$('#photos').flickr(config).photosSearch({user_id: 'xxx', count: 10})
+$('#photos').flickr(config).photosSearch({user_id: 'xxx', per_page: 10})
 
 // recent 10 photos from a user's stream with the tag 'portfolio'
-$('#photos').flickr(config).photosSearch({user_id: 'xxx', count: 10, tags: 'portfolio'})
+$('#photos').flickr(config).photosSearch({user_id: 'xxx', per_page: 10, tags: 'portfolio'})
 
 // recent 10 photos from a particular photoset
 $('#photoset').flickr(config).photosetsGetPhotos({photoset_id: '72157600185772527', per_page: 10})
