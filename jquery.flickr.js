@@ -83,6 +83,7 @@
       $.getJSON($.flickr.url(method, options), function(data) {
         photos = (data.photos === undefined ? data.photoset : data.photos)
         elements.append($.flickr.thumbnail.process(photos))
+        $(document).trigger("flickrLoaded");
       })
     })
   }
