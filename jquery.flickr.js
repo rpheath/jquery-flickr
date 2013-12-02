@@ -43,10 +43,10 @@
   
   // helper methods for thumbnails
   $.flickr.thumbnail = {
-    src: function(photo, size) {
+    src: function(photo, id, size) {
       if (size === undefined) size = $.flickr.translate($.flickr.settings.thumbnail_size)
       return 'http://farm' + photo.farm + '.static.flickr.com/' + photo.server + 
-        '/' + photo.id + '_' + photo.secret + size + '.jpg'
+        '/' + id + '_' + photo.secret + size + '.jpg'
     },
     imageTag: function(image) {
       return '<img src="' + image.src + '" alt="' + image.alt + '" />'
@@ -56,15 +56,15 @@
   // accepts a series of photos and constructs
   // the thumbnails that link back to Flickr
   $.flickr.thumbnail.process = function(photos) {
-    var thumbnails = $.map(photos.photo, function(photo) {
+    var thumbnails = $.map(photos, function(photo) {
       var image = new Image(), html = '', href = undefined
 
-      image.src = $.flickr.thumbnail.src(photo)
+      image.src = $.flickr.thumbnail.src(photo, photo.id)
       image.alt = photo.title
 
       var size = $.flickr.settings.link_to_size
       if (size != undefined && size.match(/sq|t|s|m|o/)) 
-        href = $.flickr.thumbnail.src(photo, $.flickr.translate(size))
+        href = $.flickr.thumbnail.src(photo, photo.id, $.flickr.translate(size))
       
       html = $.flickr.linkTag($.flickr.thumbnail.imageTag(image), photo, href)
         
@@ -73,18 +73,67 @@
     
     return $('<ul class="flickr"></ul>').append(thumbnails)
   }
-  
-  // handles requesting and thumbnailing photos
-  $.flickr.photos = function(method, options) {
+
+  $.flickr.thumbnail.processSet = function(photosets, options){
+    var list = document.createElement('ul');
+    list.className = 'flickr';
+
+    for(var i = 0, len = photosets.length; i < len; i++){
+      var photoset = photosets[i];
+      console.log(photoset);
+      var image = new Image(), html = '', href = undefined;
+
+      var size = $.flickr.settings.link_to_size
+
+      var href = $.flickr.thumbnail.src(photoset, photoset.primary)
+      if (size != undefined && size.match(/sq|t|s|m|o/)) 
+        href = $.flickr.thumbnail.src(photoset, photoset.primary, $.flickr.translate(size));
+
+      image.src = href;
+      image.alt = photoset.title._content;
+      image.title = photoset.title._content;
+
+      var a = document.createElement('a');
+      a.href = 'http://flickr.com/photos/'+options.user_id+'/sets/'+photoset.id;
+      a.appendChild(image);
+
+      var li = document.createElement('li');
+      li.appendChild(a);
+
+      list.appendChild(li);
+    }
+
+    return $(list);
+  }
+
+  //Handles the JSON request
+  $.flickr.request = function(method, options, callback) {
     var options = $.extend($.flickr.settings, options || {}),
         elements = $.flickr.self, photos
     
     return elements.each(function() {
       $.getJSON($.flickr.url(method, options), function(data) {
+        callback(data, elements);
+      });
+    });
+  }
+  
+  // handles requesting and thumbnailing photos
+  $.flickr.photos = function(method, options) {
+    $.flickr.request(method, options, function(data, elements){
         photos = (data.photos === undefined ? data.photoset : data.photos)
-        elements.append($.flickr.thumbnail.process(photos))
-      })
-    })
+        elements.append($.flickr.thumbnail.process(photos.photo))
+    });
+  }
+
+  $.flickr.photosets = function(method, options) {
+    $.flickr.request(method, options, function(data, elements){
+        if(data.stat !== 'ok')
+          return false;
+        photosets = data.photosets;
+        //elements.append($.flickr.thumbnail.process(photosets.photoset))
+        elements.append($.flickr.thumbnail.processSet(photosets.photoset, options));
+    });
   }
   
   // namespace to hold available API methods
@@ -105,6 +154,9 @@
     // http://www.flickr.com/services/api/flickr.photosets.getPhotos.html
     photosetsGetPhotos: function(options) {
       $.flickr.photos('flickr.photosets.getPhotos', options)
+    },
+    photosetsGetList: function(options) {
+      $.flickr.photosets('flickr.photosets.getList', options) 
     }
   }
   

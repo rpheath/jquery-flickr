@@ -1,0 +1,13 @@
+{
+	"name": "jquery-flickr",
+	"version": "",
+	"main": [
+		"jquery-flickr.js"
+	],
+	"ignore": [],
+	"keywords": [
+		"jquery",
+		"flickr",
+		"javascript"
+	]
+}
